@@ -14,7 +14,7 @@ print("Hello, " + name)
 ```delta
 screen(640, 400)
 background("#182033")
-square(60, 80, 70, "#9c8cff")
+square[\n    name(Player)\n    location(60, 80)\n    size(70)\n    color("#9c8cff")\n]\nmovesquare("Player", 3.5)
 circle(220, 120, 35, "#72e0b1")
 text("Made with Delta!", 60, 230, "#ffffff", 28)
 ```
@@ -35,7 +35,7 @@ text("Made with Delta!", 60, 230, "#ffffff", 28)
 
 - `screen(width, height)` sets the canvas size
 - `background(color)` fills the canvas
-- `square(x, y, size, color)` draws a square
+- `square[ name(Name) location(x, y) size(value) color(color) ]` creates and draws a named square without moving it\n- `movesquare("Name", speed)` adds keyboard movement to an already-created square without drawing another one
 - `rect(x, y, width, height, color)` draws a rectangle
 - `circle(x, y, radius, color)` draws a circle
 - `text(message, x, y, color, size)` draws text
