@@ -1280,6 +1280,21 @@ class DeltaParser {
     if (name === "setSquareSize") { runtimeSquareSettings.size = Math.max(0, Number(args[0]) || 0); return null; }
     if (name === "setSquareLocation") { runtimeSquareSettings.x = Number(args[0]) || 0; runtimeSquareSettings.y = Number(args[1]) || 0; return null; }
     if (name === "setSquareSpeed") { runtimeSquareSettings.speed = Math.max(0, Number(args[0]) || 0); return null; }
+    if (name === "namedSquare") {
+      const shape = {type:"square",name:String(args[0]??""),x:Number(args[1])||0,y:Number(args[2])||0,size:Math.max(0,Number(args[3])||0),color:String(args[4]??"#ffffff"),moving:false,speed:0,controls:defaultMovementControls()};
+      if(!shape.name)throw new Error("A named square needs a name.");
+      if(runtimeScene.some(s=>s.name===shape.name))throw new Error('A shape named "'+shape.name+'" already exists.');
+      runtimeScene.push(shape); drawRuntimeScene(); return null;
+    }
+    if (name === "movesquare") {
+      const targetName=String(args[0]??"");
+      const shape=runtimeScene.find(s=>s.type==="square"&&s.name===targetName);
+      if(!shape)throw new Error('No square named "'+targetName+'" exists. Draw it first with square[ name('+targetName+') ... ].');
+      shape.moving=true;
+      shape.speed=Math.max(0,Number(args[1])||3.5);
+      shape.controls=parseMovementControls(args[2]);
+      startRuntimeMovement(); drawRuntimeScene(); return null;
+    }
     if (name === "square" || name === "moveSquare") {
       const moving = name === "moveSquare";
       const legacy = typeof args[0] === "number";
@@ -1436,9 +1451,8 @@ function runCode() {
         const movement = settings.movement;
         if (type === "square") {
           const size = settings.size ?? "40";
-          const args = [loc[0]||"100",loc[1]||"100",size,color];
-          if (movement !== undefined) return indent + "moveSquare(" + args.join(",") + "," + (settings.speed ?? "3.5") + "," + movement + ")";
-          return indent + "square(" + args.join(",") + ")";
+          const args = [JSON.stringify(settings.name),loc[0]||"100",loc[1]||"100",size,color];
+          return indent + "namedSquare(" + args.join(",") + ")";
         }
         if (type === "rect") {
           const width = settings.width ?? settings.size ?? "60", height = settings.height ?? settings.size ?? "40";
